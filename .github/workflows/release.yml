@@ -69,7 +69,8 @@ jobs:
           java-version: ${{ startsWith(matrix.version, '26.') && '25' || ((matrix.version == '1.20.5' || matrix.version == '1.20.6' || startsWith(matrix.version, '1.21')) && '21' || '17') }}
       - uses: gradle/actions/setup-gradle@v6
         with:
-          gradle-version: ${{ matrix.group == '1.20' && '8.14.3' || matrix.group == '1.21' && '9.5.1' || '9.7.1' }}name: Build
+          gradle-version: ${{ matrix.group == '1.20' && '8.14.3' || matrix.group == '1.21' && '9.5.1' || '9.7.1' }}
+      - name: Build
         env:
           VERSION: ${{ matrix.version }}
           RELEASE_VERSION: ${{ inputs.release_version }}

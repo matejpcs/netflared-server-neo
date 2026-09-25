@@ -1,7 +1,7 @@
 plugins { id 'net.neoforged.moddev' version '2.0.147' }
 group='com.matejpcs.netflared'
 version='0.1.6-SNAPSHOT'
-def neo=project.findProperty('neo_version') ?: '26.2.0.75'
+def neo=project.findProperty('neo_version') ?: '26.2.0.87'
 def neoSeries=neo.tokenize('.')[0..1].join('.')
 java.toolchain.languageVersion=JavaLanguageVersion.of(25)
 neoForge { version=neo }

@@ -1,0 +1,153 @@
+name: Build & Release NeoForge compatibility bundles
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: Netflared mod release version
+        required: true
+        default: "0.1.0"
+  push:
+    tags:
+      - "server-v*"
+
+permissions:
+  contents: write
+
+env:
+  GRADLE_VERSION: "9.7.1"
+
+jobs:
+  build-1-20:
+    name: NeoForge 1.20.x / ${{ matrix.mc }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { mc: "1.20.1", neo: "20.1.121" }
+          - { mc: "1.20.2", neo: "20.2.88" }
+          - { mc: "1.20.3", neo: "20.3.8-beta" }
+          - { mc: "1.20.4", neo: "20.4.237" }
+          - { mc: "1.20.5", neo: "20.5.133" }
+          - { mc: "1.20.6", neo: "20.6.62-beta" }
+    steps:
+      - uses: actions/checkout@v7
+        with: { ref: 1.20.x }
+      - uses: actions/setup-java@v6
+        with: { distribution: temurin, java-version: "21" }
+      - uses: gradle/actions/setup-gradle@v6
+        with: { gradle-version: ${{ env.GRADLE_VERSION }} }
+      - run: gradle clean build --no-daemon -Pmod_version="${{ inputs.release_version || '0.1.0' }}" -Pminecraft_version="${{ matrix.mc }}" -Pneo_version="${{ matrix.neo }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: netflared-neo-1.20-${{ matrix.mc }}
+          path: build/libs/*.jar
+          if-no-files-found: error
+
+  build-1-21:
+    name: NeoForge 1.21.x / ${{ matrix.mc }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { mc: "1.21", neo: "21.0.167" }
+          - { mc: "1.21.1", neo: "21.1.208" }
+          - { mc: "1.21.2", neo: "21.2.1-beta" }
+          - { mc: "1.21.3", neo: "21.3.89" }
+          - { mc: "1.21.4", neo: "21.4.156" }
+          - { mc: "1.21.5", neo: "21.5.95" }
+          - { mc: "1.21.6", neo: "21.6.20-beta" }
+          - { mc: "1.21.7", neo: "21.7.25-beta" }
+          - { mc: "1.21.8", neo: "21.8.47-beta" }
+          - { mc: "1.21.9", neo: "21.9.16-beta" }
+          - { mc: "1.21.10", neo: "21.10.52-beta" }
+          - { mc: "1.21.11", neo: "21.11.25-beta" }
+    steps:
+      - uses: actions/checkout@v7
+        with: { ref: 1.21.x }
+      - uses: actions/setup-java@v6
+        with: { distribution: temurin, java-version: "21" }
+      - uses: gradle/actions/setup-gradle@v6
+        with: { gradle-version: ${{ env.GRADLE_VERSION }} }
+      - run: gradle clean build --no-daemon -Pmod_version="${{ inputs.release_version || '0.1.0' }}" -Pminecraft_version="${{ matrix.mc }}" -Pneo_version="${{ matrix.neo }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: netflared-neo-1.21-${{ matrix.mc }}
+          path: build/libs/*.jar
+          if-no-files-found: error
+
+  build-26:
+    name: NeoForge 26.x / ${{ matrix.mc }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { mc: "26.1.1", neo: "26.1.1.0" }
+          - { mc: "26.1.2", neo: "26.1.2.0" }
+          - { mc: "26.2", neo: "26.2.0.75" }
+    steps:
+      - uses: actions/checkout@v7
+        with: { ref: 26.x }
+      - uses: actions/setup-java@v6
+        with: { distribution: temurin, java-version: "25" }
+      - uses: gradle/actions/setup-gradle@v6
+        with: { gradle-version: ${{ env.GRADLE_VERSION }} }
+      - run: gradle clean build --no-daemon -Pmod_version="${{ inputs.release_version || '0.1.0' }}" -Pminecraft_version="${{ matrix.mc }}" -Pneo_version="${{ matrix.neo }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: netflared-neo-26-${{ matrix.mc }}
+          path: build/libs/*.jar
+          if-no-files-found: error
+
+  all-builds:
+    name: All NeoForge compatibility builds passed
+    needs: [build-1-20, build-1-21, build-26]
+    if: ${{ always() && needs.build-1-20.result == 'success' && needs.build-1-21.result == 'success' && needs.build-26.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "All NeoForge compatibility builds passed."
+
+  release-1-20:
+    needs: all-builds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { pattern: netflared-neo-1.20-*, path: release, merge-multiple: true }
+      - uses: softprops/action-gh-release@v3
+        with:
+          tag_name: "v${{ inputs.release_version || '0.1.0' }}-1.20.x"
+          name: "Netflared Server ${{ inputs.release_version || '0.1.0' }} — NeoForge 1.20.x"
+          target_commitish: 1.20.x
+          generate_release_notes: true
+          files: release/*.jar
+
+  release-1-21:
+    needs: all-builds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { pattern: netflared-neo-1.21-*, path: release, merge-multiple: true }
+      - uses: softprops/action-gh-release@v3
+        with:
+          tag_name: "v${{ inputs.release_version || '0.1.0' }}-1.21.x"
+          name: "Netflared Server ${{ inputs.release_version || '0.1.0' }} — NeoForge 1.21.x"
+          target_commitish: 1.21.x
+          generate_release_notes: true
+          files: release/*.jar
+
+  release-26:
+    needs: all-builds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { pattern: netflared-neo-26-*, path: release, merge-multiple: true }
+      - uses: softprops/action-gh-release@v3
+        with:
+          tag_name: "v${{ inputs.release_version || '0.1.0' }}-26.x"
+          name: "Netflared Server ${{ inputs.release_version || '0.1.0' }} — NeoForge 26.x"
+          target_commitish: 26.x
+          generate_release_notes: true
+          files: release/*.jar

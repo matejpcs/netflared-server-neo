@@ -8,7 +8,7 @@ on:
       release_version:
         description: Release version
         required: true
-        default: "0.1.11"
+        default: "0.1.12"
 
 permissions:
   contents: write
@@ -54,7 +54,7 @@ jobs:
         with:
           gradle-version: ${{ matrix.gradle }}
       - name: Build
-        run: gradle clean build --no-daemon --stacktrace --refresh-dependencies -Pmod_version="0.1.11" -Pminecraft_version="${{ matrix.mc }}" -Pneo_version="${{ matrix.neo }}"
+        run: gradle clean build --no-daemon --stacktrace --refresh-dependencies -Pmod_version="0.1.12" -Pminecraft_version="${{ matrix.mc }}" -Pneo_version="${{ matrix.neo }}"
       - name: Verify JAR
         run: |
           set -euo pipefail
@@ -78,8 +78,8 @@ jobs:
           merge-multiple: true
       - uses: softprops/action-gh-release@v3
         with:
-          tag_name: "v${{ inputs.release_version || '0.1.11' }}"
-          name: "Netflared Server ${{ inputs.release_version || '0.1.11' }} — NeoForge"
+          tag_name: "v${{ inputs.release_version || '0.1.12' }}"
+          name: "Netflared Server ${{ inputs.release_version || '0.1.12' }} — NeoForge"
           target_commitish: main
           generate_release_notes: true
           files: release/*.jar

@@ -107,7 +107,7 @@ jobs:
             group: "26"
             java: "25"
             gradle: "9.5.1"
-   steps:
+    steps:
       - uses: actions/checkout@v7
         with:
           ref: ${{ matrix.version }}

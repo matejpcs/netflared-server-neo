@@ -150,7 +150,7 @@ jobs:
         run: |
           set -euo pipefail
           gradle clean build --no-daemon --stacktrace --refresh-dependencies -Pmod_version="$RELEASE_VERSION" -Pminecraft_version="$VERSION" -Pneo_version="$NEO_VERSION"
-          jar="$(find build/libs -maxdepth 1 -type f -name '*.jar' ! -name '*sources*' | head -n1)"
+          jar="$(find build/libs -maxdepth 1 -type f -name '*.jar' ! -name '*sources*' ! -name '*dev*' ! -name '*javadoc*' | head -n1)"
           test -n "$jar"
           cp "$jar" "netflared-server-neo-$VERSION.jar"
       - uses: actions/upload-artifact@v4

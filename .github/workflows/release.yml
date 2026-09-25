@@ -22,91 +22,91 @@ jobs:
           - version: "1.20.1"
             group: "1.20"
             java: "17"
-            gradle: "8.8"
+            gradle: "9.2.1"
           - version: "1.20.2"
             group: "1.20"
             java: "17"
-            gradle: "8.8"
+            gradle: "9.2.1"
           - version: "1.20.3"
             group: "1.20"
             java: "17"
-            gradle: "8.8"
+            gradle: "9.2.1"
           - version: "1.20.4"
             group: "1.20"
             java: "17"
-            gradle: "8.8"
+            gradle: "9.2.1"
           - version: "1.20.5"
             group: "1.20"
             java: "21"
-            gradle: "8.8"
+            gradle: "9.2.1"
           - version: "1.20.6"
             group: "1.20"
             java: "21"
-            gradle: "8.8"
+            gradle: "9.2.1"
           - version: "1.21"
             group: "1.21"
             java: "21"
-            gradle: "9.5.1"
+            gradle: "9.2.1"
           - version: "1.21.1"
             group: "1.21"
             java: "21"
-            gradle: "9.5.1"
+            gradle: "9.2.1"
           - version: "1.21.2"
             group: "1.21"
             java: "21"
-            gradle: "9.5.1"
+            gradle: "9.2.1"
           - version: "1.21.3"
             group: "1.21"
             java: "21"
-            gradle: "9.5.1"
+            gradle: "9.2.1"
           - version: "1.21.4"
             group: "1.21"
             java: "21"
-            gradle: "9.5.1"
+            gradle: "9.2.1"
           - version: "1.21.5"
             group: "1.21"
             java: "21"
-            gradle: "9.5.1"
+            gradle: "9.2.1"
           - version: "1.21.6"
             group: "1.21"
             java: "21"
-            gradle: "9.5.1"
+            gradle: "9.2.1"
           - version: "1.21.7"
             group: "1.21"
             java: "21"
-            gradle: "9.5.1"
+            gradle: "9.2.1"
           - version: "1.21.8"
             group: "1.21"
             java: "21"
-            gradle: "9.5.1"
+            gradle: "9.2.1"
           - version: "1.21.9"
             group: "1.21"
             java: "21"
-            gradle: "9.5.1"
+            gradle: "9.2.1"
           - version: "1.21.10"
             group: "1.21"
             java: "21"
-            gradle: "9.5.1"
+            gradle: "9.2.1"
           - version: "1.21.11"
             group: "1.21"
             java: "21"
-            gradle: "9.5.1"
+            gradle: "9.2.1"
           - version: "26.1"
             group: "26"
             java: "25"
-            gradle: "9.5.1"
+            gradle: "9.2.1"
           - version: "26.1.1"
             group: "26"
             java: "25"
-            gradle: "9.5.1"
+            gradle: "9.2.1"
           - version: "26.1.2"
             group: "26"
             java: "25"
-            gradle: "9.5.1"
+            gradle: "9.2.1"
           - version: "26.2"
             group: "26"
             java: "25"
-            gradle: "9.5.1"
+            gradle: "9.2.1"
     steps:
       - uses: actions/checkout@v7
         with:
@@ -124,42 +124,17 @@ jobs:
           VERSION: ${{ matrix.version }}
         run: |
           set -euo pipefail
-          if [ "$VERSION" = "1.20.1" ]; then
-            neo="1.20.1-47.1.106"
-          else
-            case "$VERSION" in
-              1.20.2) prefix="20.2." ;;
-              1.20.3) prefix="20.3." ;;
-              1.20.4) prefix="20.4." ;;
-              1.20.5) prefix="20.5." ;;
-              1.20.6) prefix="20.6." ;;
-              1.21) prefix="21.0." ;;
-              1.21.1) prefix="21.1." ;;
-              1.21.2) prefix="21.2." ;;
-              1.21.3) prefix="21.3." ;;
-              1.21.4) prefix="21.4." ;;
-              1.21.5) prefix="21.5." ;;
-              1.21.6) prefix="21.6." ;;
-              1.21.7) prefix="21.7." ;;
-              1.21.8) prefix="21.8." ;;
-              1.21.9) prefix="21.9." ;;
-              1.21.10) prefix="21.10." ;;
-              1.21.11) prefix="21.11." ;;
-              26.1) prefix="26.1." ;;
-              26.1.1) prefix="26.1.1." ;;
-              26.1.2) prefix="26.1.2." ;;
-              26.2) prefix="26.2." ;;
-              *) echo "Unsupported NeoForge version: $VERSION"; exit 1 ;;
-            esac
-            curl --fail --silent --show-error \
-              "https://maven.neoforged.net/releases/net/neoforged/neoforge/maven-metadata.xml" \
-              -o /tmp/neoforge-maven-metadata.xml
-            neo="$(grep -o '<version>[^<]*</version>' /tmp/neoforge-maven-metadata.xml |
-              sed 's#<version>##;s#</version>##' |
-              grep "^$prefix" |
-              sort -V |
-              tail -n1)"
-            test -n "$neo"
+          json="$(curl --fail --silent --show-error \
+            "https://meta-api.prod.k8s.neoforged.net/v1/neoforge-versions/")"
+          neo="$(printf '%s' "$json" | jq -r --arg mc "$VERSION" '
+            map(select(.minecraft_version == $mc))
+            | sort_by(.version)
+            | last
+            | .version // empty
+          ')"
+          if [ -z "$neo" ]; then
+            echo "No NeoForge release found for Minecraft $VERSION"
+            exit 1
           fi
           echo "neo=$neo" >> "$GITHUB_OUTPUT"
           echo "NeoForge for Minecraft $VERSION: $neo"

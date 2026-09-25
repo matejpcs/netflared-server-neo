@@ -1,0 +1,62 @@
+name: Build NeoForge 26.x
+
+on:
+  push:
+    branches: ["26.x"]
+  pull_request:
+    branches: ["26.x"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: netflared-neoforge-26-x
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: NeoForge ${{ matrix.mc }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - mc: "26.1.1"
+            neo: "26.1.1.0-beta"
+            java: "25"
+          - mc: "26.1.2"
+            neo: "26.1.2.88"
+            java: "25"
+          - mc: "26.2"
+            neo: "26.2.0.75"
+            java: "25"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set up Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "${{ matrix.java }}"
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: "9.7.1"
+      - name: Build
+        run: gradle clean build --no-daemon --stacktrace --refresh-dependencies -Pminecraft_version="${{ matrix.mc }}" -Pneo_version="${{ matrix.neo }}"
+      - name: Verify JAR
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          jars=(build/libs/*.jar)
+          test "${#jars[@]}" -gt 0
+          printf '%s
+' "${jars[@]}"
+      - name: Upload JAR
+        uses: actions/upload-artifact@v6
+        with:
+          name: netflared-neoforge-26-x
+          path: build/libs/*.jar
+          if-no-files-found: error

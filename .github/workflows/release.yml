@@ -15,7 +15,7 @@ permissions:
   contents: write
 
 env:
-  GRADLE_VERSION: "9.7.1"
+  GRADLE_VERSION: "8.14.3"
 
 jobs:
   build-1-20:
@@ -95,7 +95,7 @@ jobs:
             neo: "21.7.25-beta"
             java: "21"
           - mc: "1.21.8"
-            neo: "21.8.47-beta"
+            neo: "21.8.47"
             java: "21"
           - mc: "1.21.9"
             neo: "21.9.16-beta"
@@ -134,10 +134,10 @@ jobs:
       matrix:
         include:
           - mc: "26.1.1"
-            neo: "26.1.1.0"
+            neo: "26.1.1.0-beta"
             java: "25"
           - mc: "26.1.2"
-            neo: "26.1.2.0"
+            neo: "26.1.2.88"
             java: "25"
           - mc: "26.2"
             neo: "26.2.0.75"
@@ -152,7 +152,7 @@ jobs:
           java-version: ${{ matrix.java }}
       - uses: gradle/actions/setup-gradle@v6
         with:
-          gradle-version: ${{ env.GRADLE_VERSION }}
+          gradle-version: "9.7.1"
       - name: Build and test
         run: |
           gradle clean build --no-daemon -Pmod_version="${{ inputs.release_version || '0.1.0' }}" -Pminecraft_version="${{ matrix.mc }}" -Pneo_version="${{ matrix.neo }}"

@@ -33,12 +33,18 @@ jobs:
           - { mc: "1.20.6", neo: "20.6.62-beta" }
     steps:
       - uses: actions/checkout@v7
-        with: { ref: 1.20.x }
+        with:
+          ref: 1.20.x
       - uses: actions/setup-java@v6
-        with: { distribution: temurin, java-version: "21" }
+        with:
+          distribution: temurin
+          java-version: "21"
       - uses: gradle/actions/setup-gradle@v6
-        with: { gradle-version: ${{ env.GRADLE_VERSION }} }
-      - run: gradle clean build --no-daemon -Pmod_version="${{ inputs.release_version || '0.1.0' }}" -Pminecraft_version="${{ matrix.mc }}" -Pneo_version="${{ matrix.neo }}"
+        with:
+          gradle-version: ${{ env.GRADLE_VERSION }}
+      - name: Build and test
+        run: |
+          gradle clean build --no-daemon -Pmod_version="${{ inputs.release_version || '0.1.0' }}" -Pminecraft_version="${{ matrix.mc }}" -Pneo_version="${{ matrix.neo }}"
       - uses: actions/upload-artifact@v4
         with:
           name: netflared-neo-1.20-${{ matrix.mc }}
@@ -66,12 +72,18 @@ jobs:
           - { mc: "1.21.11", neo: "21.11.25-beta" }
     steps:
       - uses: actions/checkout@v7
-        with: { ref: 1.21.x }
+        with:
+          ref: 1.21.x
       - uses: actions/setup-java@v6
-        with: { distribution: temurin, java-version: "21" }
+        with:
+          distribution: temurin
+          java-version: "21"
       - uses: gradle/actions/setup-gradle@v6
-        with: { gradle-version: ${{ env.GRADLE_VERSION }} }
-      - run: gradle clean build --no-daemon -Pmod_version="${{ inputs.release_version || '0.1.0' }}" -Pminecraft_version="${{ matrix.mc }}" -Pneo_version="${{ matrix.neo }}"
+        with:
+          gradle-version: ${{ env.GRADLE_VERSION }}
+      - name: Build and test
+        run: |
+          gradle clean build --no-daemon -Pmod_version="${{ inputs.release_version || '0.1.0' }}" -Pminecraft_version="${{ matrix.mc }}" -Pneo_version="${{ matrix.neo }}"
       - uses: actions/upload-artifact@v4
         with:
           name: netflared-neo-1.21-${{ matrix.mc }}
@@ -90,12 +102,18 @@ jobs:
           - { mc: "26.2", neo: "26.2.0.75" }
     steps:
       - uses: actions/checkout@v7
-        with: { ref: 26.x }
+        with:
+          ref: 26.x
       - uses: actions/setup-java@v6
-        with: { distribution: temurin, java-version: "25" }
+        with:
+          distribution: temurin
+          java-version: "25"
       - uses: gradle/actions/setup-gradle@v6
-        with: { gradle-version: ${{ env.GRADLE_VERSION }} }
-      - run: gradle clean build --no-daemon -Pmod_version="${{ inputs.release_version || '0.1.0' }}" -Pminecraft_version="${{ matrix.mc }}" -Pneo_version="${{ matrix.neo }}"
+        with:
+          gradle-version: ${{ env.GRADLE_VERSION }}
+      - name: Build and test
+        run: |
+          gradle clean build --no-daemon -Pmod_version="${{ inputs.release_version || '0.1.0' }}" -Pminecraft_version="${{ matrix.mc }}" -Pneo_version="${{ matrix.neo }}"
       - uses: actions/upload-artifact@v4
         with:
           name: netflared-neo-26-${{ matrix.mc }}
@@ -115,7 +133,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
-        with: { pattern: netflared-neo-1.20-*, path: release, merge-multiple: true }
+        with:
+          pattern: netflared-neo-1.20-*
+          path: release
+          merge-multiple: true
       - uses: softprops/action-gh-release@v3
         with:
           tag_name: "v${{ inputs.release_version || '0.1.0' }}-1.20.x"
@@ -129,7 +150,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
-        with: { pattern: netflared-neo-1.21-*, path: release, merge-multiple: true }
+        with:
+          pattern: netflared-neo-1.21-*
+          path: release
+          merge-multiple: true
       - uses: softprops/action-gh-release@v3
         with:
           tag_name: "v${{ inputs.release_version || '0.1.0' }}-1.21.x"
@@ -143,7 +167,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
-        with: { pattern: netflared-neo-26-*, path: release, merge-multiple: true }
+        with:
+          pattern: netflared-neo-26-*
+          path: release
+          merge-multiple: true
       - uses: softprops/action-gh-release@v3
         with:
           tag_name: "v${{ inputs.release_version || '0.1.0' }}-26.x"

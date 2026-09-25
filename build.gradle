@@ -1,8 +1,13 @@
 plugins { id 'net.neoforged.moddev' version '2.0.147' }
 group='com.matejpcs.netflared'
-version=project.findProperty('mod_version') ?: '0.1.8-SNAPSHOT'
+version=project.findProperty('mod_version') ?: '0.1.9-SNAPSHOT'
 def neo=project.findProperty('neo_version') ?: '21.11.25-beta'
+def neoSeries=neo.tokenize('.')[0..1].join('.')
 java.toolchain.languageVersion=JavaLanguageVersion.of(21)
 neoForge { version=neo }
 tasks.withType(JavaCompile).configureEach { options.encoding='UTF-8'; options.release=21 }
+processResources {
+ inputs.properties(version:project.version, minecraft_version:'1.21.11', neoforge_version:neoSeries)
+ filesMatching('META-INF/neoforge.mods.toml') { expand(version:project.version, minecraft_version:'1.21.11', neoforge_version:neoSeries) }
+}
 jar { archiveBaseName='netflared-server-neo' }

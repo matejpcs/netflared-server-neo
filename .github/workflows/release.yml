@@ -55,6 +55,8 @@ jobs:
             group: "1.21"
           - version: "1.21.10"
             group: "1.21"
+          - version: "1.21.11"
+            group: "1.21"
           - version: "26.0"
             group: "26"
           - version: "26.1"

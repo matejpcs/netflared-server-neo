@@ -25,12 +25,24 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { mc: "1.20.1", neo: "20.1.121" }
-          - { mc: "1.20.2", neo: "20.2.88" }
-          - { mc: "1.20.3", neo: "20.3.8-beta" }
-          - { mc: "1.20.4", neo: "20.4.237" }
-          - { mc: "1.20.5", neo: "20.5.133" }
-          - { mc: "1.20.6", neo: "20.6.62-beta" }
+          - mc: "1.20.1"
+            neo: "20.1.121"
+            java: "21"
+          - mc: "1.20.2"
+            neo: "20.2.88"
+            java: "21"
+          - mc: "1.20.3"
+            neo: "20.3.8-beta"
+            java: "21"
+          - mc: "1.20.4"
+            neo: "20.4.237"
+            java: "21"
+          - mc: "1.20.5"
+            neo: "20.5.133"
+            java: "21"
+          - mc: "1.20.6"
+            neo: "20.6.62-beta"
+            java: "21"
     steps:
       - uses: actions/checkout@v7
         with:
@@ -38,7 +50,7 @@ jobs:
       - uses: actions/setup-java@v6
         with:
           distribution: temurin
-          java-version: "21"
+          java-version: ${{ matrix.java }}
       - uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
@@ -58,18 +70,42 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { mc: "1.21", neo: "21.0.167" }
-          - { mc: "1.21.1", neo: "21.1.208" }
-          - { mc: "1.21.2", neo: "21.2.1-beta" }
-          - { mc: "1.21.3", neo: "21.3.89" }
-          - { mc: "1.21.4", neo: "21.4.156" }
-          - { mc: "1.21.5", neo: "21.5.95" }
-          - { mc: "1.21.6", neo: "21.6.20-beta" }
-          - { mc: "1.21.7", neo: "21.7.25-beta" }
-          - { mc: "1.21.8", neo: "21.8.47-beta" }
-          - { mc: "1.21.9", neo: "21.9.16-beta" }
-          - { mc: "1.21.10", neo: "21.10.52-beta" }
-          - { mc: "1.21.11", neo: "21.11.25-beta" }
+          - mc: "1.21"
+            neo: "21.0.167"
+            java: "21"
+          - mc: "1.21.1"
+            neo: "21.1.208"
+            java: "21"
+          - mc: "1.21.2"
+            neo: "21.2.1-beta"
+            java: "21"
+          - mc: "1.21.3"
+            neo: "21.3.89"
+            java: "21"
+          - mc: "1.21.4"
+            neo: "21.4.156"
+            java: "21"
+          - mc: "1.21.5"
+            neo: "21.5.95"
+            java: "21"
+          - mc: "1.21.6"
+            neo: "21.6.20-beta"
+            java: "21"
+          - mc: "1.21.7"
+            neo: "21.7.25-beta"
+            java: "21"
+          - mc: "1.21.8"
+            neo: "21.8.47-beta"
+            java: "21"
+          - mc: "1.21.9"
+            neo: "21.9.16-beta"
+            java: "21"
+          - mc: "1.21.10"
+            neo: "21.10.52-beta"
+            java: "21"
+          - mc: "1.21.11"
+            neo: "21.11.25-beta"
+            java: "21"
     steps:
       - uses: actions/checkout@v7
         with:
@@ -77,7 +113,7 @@ jobs:
       - uses: actions/setup-java@v6
         with:
           distribution: temurin
-          java-version: "21"
+          java-version: ${{ matrix.java }}
       - uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}
@@ -97,9 +133,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { mc: "26.1.1", neo: "26.1.1.0" }
-          - { mc: "26.1.2", neo: "26.1.2.0" }
-          - { mc: "26.2", neo: "26.2.0.75" }
+          - mc: "26.1.1"
+            neo: "26.1.1.0"
+            java: "25"
+          - mc: "26.1.2"
+            neo: "26.1.2.0"
+            java: "25"
+          - mc: "26.2"
+            neo: "26.2.0.75"
+            java: "25"
     steps:
       - uses: actions/checkout@v7
         with:
@@ -107,7 +149,7 @@ jobs:
       - uses: actions/setup-java@v6
         with:
           distribution: temurin
-          java-version: "25"
+          java-version: ${{ matrix.java }}
       - uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: ${{ env.GRADLE_VERSION }}

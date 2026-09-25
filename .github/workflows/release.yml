@@ -118,27 +118,30 @@ jobs:
       - uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: ${{ matrix.gradle }}
-      - name: Get NeoForge Meta API token
-        id: oidc
-        uses: actions/github-script@v7
-        with:
-          script: core.setOutput('token', await core.getIDToken('neoforged-meta-api'))
       - name: Resolve NeoForge version
         id: deps
         env:
           VERSION: ${{ matrix.version }}
-          META_API_TOKEN: ${{ steps.oidc.outputs.token }}
         run: |
           set -euo pipefail
           if [ "$VERSION" = "1.20.1" ]; then
             neo="1.20.1-47.1.106"
           else
-            curl --fail --silent --show-error \
-              -H "Authorization: Bearer ${META_API_TOKEN}" \
-              "https://meta-api.prod.k8s.neoforged.net/v1/neoforge-versions/" \
-              -o /tmp/neoforge-versions.json
-            neo="$(jq -r --arg mc "$VERSION" 'map(select(.version == $mc and .latest_neoforge_version != null)) | sort_by(.released) | .[-1].latest_neoforge_version // empty' /tmp/neoforge-versions.json)"
-            test -n "$neo" && test "$neo" != "null"
+            case "$VERSION" in
+              1.20.*) prefix="${VERSION#1.}" ;;
+              1.21) prefix="21.0." ;;
+              1.21.*) prefix="21.${VERSION##*.}." ;;
+              26.*) prefix="$VERSION." ;;
+              *) echo "Unsupported NeoForge version: $VERSION"; exit 1 ;;
+            esac
+            neo="$(curl -fsSL 'https://maven.neoforged.net/releases/net/neoforged/neoforge/' |
+              grep -oE 'href="[0-9][^"]+/"' |
+              sed -E 's/href="([^"]+)"/\1/' |
+              sed 's#/$##' |
+              grep "^$prefix" |
+              sort -V |
+              tail -n1)"
+            test -n "$neo"
           fi
           echo "neo=$neo" >> "$GITHUB_OUTPUT"
           echo "NeoForge for Minecraft $VERSION: $neo"

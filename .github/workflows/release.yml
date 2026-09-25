@@ -155,7 +155,7 @@ jobs:
               "https://maven.neoforged.net/releases/net/neoforged/neoforge/")"
             neo="$(printf '%s' "$html" |
               grep -oE 'href="[^"]+/"' |
-              sed 's#href="//##;s#href="##;s#/"$##' |
+              sed 's#.*href="./##;s#/"$##' |
               grep -F "$prefix" |
               sort -V |
               tail -n1)"

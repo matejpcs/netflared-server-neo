@@ -1,4 +1,4 @@
-plugins { id 'net.neoforged.moddev' version '2.0.42-beta' }
+plugins { id 'net.neoforged.moddev' version '2.0.141' }
 group='com.matejpcs.netflared'
 version='0.1.4-SNAPSHOT'
 def neo=project.findProperty('neo_version') ?: '21.11.25-beta'

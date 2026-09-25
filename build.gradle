@@ -6,7 +6,7 @@ def mc=project.findProperty('minecraft_version') ?: '1.20.6'
 def neoSeries=neo.tokenize('.')[0..1].join('.')
 def javaVersion = mc in ['1.20.5','1.20.6'] ? 21 : 17
 java.toolchain.languageVersion=JavaLanguageVersion.of(javaVersion)
-dependencies { implementation 'net.neoforged:neoforge:' + neo; implementation 'com.google.code.gson:gson:2.13.2' }
+dependencies { implementation 'net.neoforged:neoforge:' + neo }
 tasks.withType(JavaCompile).configureEach { options.encoding='UTF-8'; options.release=javaVersion }
 processResources {
  inputs.properties(version:project.version, minecraft_version:mc, neoforge_version:neoSeries)

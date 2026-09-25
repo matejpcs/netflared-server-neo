@@ -118,30 +118,50 @@ jobs:
       - uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: ${{ matrix.gradle }}
-      - name: Get NeoForge Meta API token
-        id: oidc
-        uses: actions/github-script@v7
-        with:
-          script: core.setOutput('token', await core.getIDToken('neoforge-meta-api'))
       - name: Resolve NeoForge version
         id: deps
         env:
           VERSION: ${{ matrix.version }}
         run: |
           set -euo pipefail
-          json="$(curl --fail --silent --show-error \
-            -H "Authorization: Bearer ${{ steps.oidc.outputs.token }}" \
-            "https://meta-api.prod.k8s.neoforged.net/v1/neoforge-versions/")"
-          neo="$(printf '%s' "$json" | jq -r --arg mc "$VERSION" '
-            map(select(.minecraft_version == $mc))
-            | sort_by(.version)
-            | last
-            | .version // empty
-          ')"
-          if [ -z "$neo" ]; then
-            echo "No NeoForge release found for Minecraft $VERSION"
-            exit 1
+          case "$VERSION" in
+            1.20.1) neo="1.20.1-47.1.106" ;;
+            1.20.2) prefix="20.2." ;;
+            1.20.3) prefix="20.3." ;;
+            1.20.4) prefix="20.4." ;;
+            1.20.5) prefix="20.5." ;;
+            1.20.6) prefix="20.6." ;;
+            1.21) prefix="21.0." ;;
+            1.21.1) prefix="21.1." ;;
+            1.21.2) prefix="21.2." ;;
+            1.21.3) prefix="21.3." ;;
+            1.21.4) prefix="21.4." ;;
+            1.21.5) prefix="21.5." ;;
+            1.21.6) prefix="21.6." ;;
+            1.21.7) prefix="21.7." ;;
+            1.21.8) prefix="21.8." ;;
+            1.21.9) prefix="21.9." ;;
+            1.21.10) prefix="21.10." ;;
+            1.21.11) prefix="21.11." ;;
+            26.1) prefix="26.1." ;;
+            26.1.1) prefix="26.1.1." ;;
+            26.1.2) prefix="26.1.2." ;;
+            26.2) prefix="26.2." ;;
+            *) echo "Unsupported NeoForge version: $VERSION"; exit 1 ;;
+          esac
+
+          if [ "$VERSION" != "1.20.1" ]; then
+            curl --fail --silent --show-error \
+              "https://maven.neoforged.net/releases/net/neoforged/neoforge/maven-metadata.xml" \
+              -o /tmp/neoforge-maven-metadata.xml
+            neo="$(grep -o '<version>[^<]*</version>' /tmp/neoforge-maven-metadata.xml |
+              sed 's#<version>##;s#</version>##' |
+              grep -F "$prefix" |
+              sort -V |
+              tail -n1)"
+            test -n "$neo"
           fi
+
           echo "neo=$neo" >> "$GITHUB_OUTPUT"
           echo "NeoForge for Minecraft $VERSION: $neo"
       - name: Build

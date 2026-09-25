@@ -10,80 +10,24 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: netflared-neoforge-1-21-x
-  cancel-in-progress: true
-
 jobs:
   build:
-    name: NeoForge ${{ matrix.mc }}
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - mc: "1.21"
-            neo: "21.0.167"
-            java: "21"
-          - mc: "1.21.1"
-            neo: "21.1.208"
-            java: "21"
-          - mc: "1.21.2"
-            neo: "21.2.1-beta"
-            java: "21"
-          - mc: "1.21.3"
-            neo: "21.3.89"
-            java: "21"
-          - mc: "1.21.4"
-            neo: "21.4.156"
-            java: "21"
-          - mc: "1.21.5"
-            neo: "21.5.95"
-            java: "21"
-          - mc: "1.21.6"
-            neo: "21.6.20-beta"
-            java: "21"
-          - mc: "1.21.7"
-            neo: "21.7.25-beta"
-            java: "21"
-          - mc: "1.21.8"
-            neo: "21.8.47"
-            java: "21"
-          - mc: "1.21.9"
-            neo: "21.9.16-beta"
-            java: "21"
-          - mc: "1.21.10"
-            neo: "21.10.52-beta"
-            java: "21"
-          - mc: "1.21.11"
-            neo: "21.11.25-beta"
-            java: "21"
     steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-      - name: Set up Java
-        uses: actions/setup-java@v6
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
-          java-version: "${{ matrix.java }}"
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v6
+          java-version: "21"
+      - uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: "9.5.1"
       - name: Build
-        run: gradle clean build --no-daemon --stacktrace --refresh-dependencies -Pminecraft_version="${{ matrix.mc }}" -Pneo_version="${{ matrix.neo }}"
+        run: gradle clean build --no-daemon --stacktrace --refresh-dependencies -Pminecraft_version="1.21.11" -Pneo_version="21.11.25-beta"
       - name: Verify JAR
-        shell: bash
-        run: |
-          set -euo pipefail
-          shopt -s nullglob
-          jars=(build/libs/*.jar)
-          test "${#jars[@]}" -gt 0
-          printf '%s
-' "${jars[@]}"
-      - name: Upload JAR
-        uses: actions/upload-artifact@v6
+        run: test -n "$(find build/libs -maxdepth 1 -name '*.jar' -print -quit)"
+      - uses: actions/upload-artifact@v6
         with:
-          name: netflared-neoforge-1-21-x
+          name: netflared-neo-1.21.11
           path: build/libs/*.jar
           if-no-files-found: error

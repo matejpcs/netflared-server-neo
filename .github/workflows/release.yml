@@ -151,11 +151,11 @@ jobs:
           esac
 
           if [ "$VERSION" != "1.20.1" ]; then
-            curl --fail --silent --show-error \
-              "https://maven.neoforged.net/releases/net/neoforged/neoforge/maven-metadata.xml" \
-              -o /tmp/neoforge-maven-metadata.xml
-            neo="$(grep -o '<version>[^<]*</version>' /tmp/neoforge-maven-metadata.xml |
-              sed 's#<version>##;s#</version>##' |
+            html="$(curl --fail --silent --show-error \
+              "https://maven.neoforged.net/releases/net/neoforged/neoforge/")"
+            neo="$(printf '%s' "$html" |
+              grep -oE 'href="[^"]+/"' |
+              sed 's#href="//##;s#href="##;s#/"$##' |
               grep -F "$prefix" |
               sort -V |
               tail -n1)"

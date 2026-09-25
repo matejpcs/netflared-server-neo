@@ -6,7 +6,7 @@ on:
       release_version:
         description: Netflared mod release version
         required: true
-        default: "0.1.0"
+        default: "0.1.8"
   push:
     tags:
       - "server-v*"

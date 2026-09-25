@@ -19,9 +19,7 @@ legacyForge {
         }
     }
 }
-dependencies {
-    implementation 'com.google.code.gson:gson:2.13.2'
-}
+
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
     options.release = 17

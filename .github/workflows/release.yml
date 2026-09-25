@@ -130,12 +130,16 @@ jobs:
           META_API_TOKEN: ${{ steps.oidc.outputs.token }}
         run: |
           set -euo pipefail
-          curl --fail --silent --show-error \
-            -H "Authorization: Bearer ${META_API_TOKEN}" \
-            "https://meta-api.prod.k8s.neoforged.net/v1/neoforge-versions/" \
-            -o /tmp/neoforge-versions.json
-          neo="$(jq -r --arg mc "$VERSION" 'map(select(.minecraft_version == $mc)) | sort_by(.released) | .[-1].version // empty' /tmp/neoforge-versions.json)"
-          test -n "$neo" && test "$neo" != "null"
+          if [ "$VERSION" = "1.20.1" ]; then
+            neo="1.20.1-47.1.106"
+          else
+            curl --fail --silent --show-error \
+              -H "Authorization: Bearer ${META_API_TOKEN}" \
+              "https://meta-api.prod.k8s.neoforged.net/v1/neoforge-versions/" \
+              -o /tmp/neoforge-versions.json
+            neo="$(jq -r --arg mc "$VERSION" 'map(select(.minecraft_version == $mc)) | sort_by(.released) | .[-1].version // empty' /tmp/neoforge-versions.json)"
+            test -n "$neo" && test "$neo" != "null"
+          fi
           echo "neo=$neo" >> "$GITHUB_OUTPUT"
           echo "NeoForge for Minecraft $VERSION: $neo"
       - name: Build

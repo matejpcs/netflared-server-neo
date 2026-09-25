@@ -91,15 +91,11 @@ jobs:
             group: "1.21"
             java: "21"
             gradle: "9.2.1"
+          - version: "26.0"
+            group: "26"
+            java: "25"
+            gradle: "9.2.1"
           - version: "26.1"
-            group: "26"
-            java: "25"
-            gradle: "9.2.1"
-          - version: "26.1.1"
-            group: "26"
-            java: "25"
-            gradle: "9.2.1"
-          - version: "26.1.2"
             group: "26"
             java: "25"
             gradle: "9.2.1"
@@ -143,9 +139,8 @@ jobs:
             1.21.9) prefix="21.9." ;;
             1.21.10) prefix="21.10." ;;
             1.21.11) prefix="21.11." ;;
+            26.0) prefix="26.0." ;;
             26.1) prefix="26.1." ;;
-            26.1.1) prefix="26.1.1." ;;
-            26.1.2) prefix="26.1.2." ;;
             26.2) prefix="26.2." ;;
             *) echo "Unsupported NeoForge version: $VERSION"; exit 1 ;;
           esac
@@ -180,7 +175,7 @@ jobs:
           name: neo-${{ matrix.version }}
           path: netflared-server-neo-${{ matrix.version }}.jar
   release:
-    if: ${{ github.event_name == 'workflow_dispatch' }}
+    if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
     name: Release NeoForge ${{ matrix.group }}
     needs: build
     runs-on: ubuntu-latest

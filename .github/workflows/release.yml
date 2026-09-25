@@ -19,6 +19,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - version: "1.20"
+            group: "1.20"
           - version: "1.20.1"
             group: "1.20"
           - version: "1.20.2"
@@ -53,8 +55,8 @@ jobs:
             group: "1.21"
           - version: "1.21.10"
             group: "1.21"
-          - version: "1.21.11"
-            group: "1.21"
+          - version: "26.0"
+            group: "26"
           - version: "26.1"
             group: "26"
           - version: "26.2"
